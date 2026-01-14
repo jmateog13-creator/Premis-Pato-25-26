@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penya L'Arjup - Premis Pato 25/26</title>
+    <!-- Font més juvenil i moderna -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estils generals */
+        body {
+            background-color: #ffffff;
+            /* Fons blanc com demanat */
+            color: #111111;
+            /* Text fosc per contrast */
+            font-family: 'Outfit', sans-serif;
+            /* Tipografia més moderna */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow-x: hidden;
+            background-image: radial-gradient(#e6e6e6 1px, transparent 1px);
+            background-size: 20px 20px;
+            /* Puntets subtils de fons */
+        }
+
+        /* Contenidor principal */
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* El Logo amb animació */
+        .logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Títols */
+        h1 {
+            text-transform: uppercase;
+            font-weight: 900;
+            font-size: 3rem;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -1px;
+            transform: rotate(-2deg);
+            /* Un toc rebel */
+            margin-bottom: 20px;
+        }
+
+        h1 span {
+            color: #FF0000;
+            display: inline-block;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s backwards;
+        }
+
+        p.subtitle {
+            font-size: 1.3rem;
+            color: #555555;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        /* Llista de categories divertida */
+        .categories {
+            background: #ffffff;
+            border: 3px solid #111;
+            box-shadow: 8px 8px 0px #FF0000;
+            /* Estil neo-brutalista pop */
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 40px;
+            border-radius: 15px;
+            transform: rotate(1deg);
+            transition: transform 0.3s;
+        }
+
+        .categories:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        .categories p {
+            margin: 8px 0;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* EL BOTÓ PRINCIPAL */
+        .cta-button {
+            background-color: #FF0000;
+            color: white;
+            text-decoration: none;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            border-radius: 50px;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(255, 0, 0, 0.3);
+            text-transform: uppercase;
+            border: 4px solid transparent;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            background-color: white;
+            color: #FF0000;
+            border-color: #FF0000;
+            box-shadow: 0 15px 30px rgba(255, 0, 0, 0.2);
+        }
+
+        .cta-button:active {
+            transform: translateY(2px);
+        }
+
+        /* Disclaimer de privacitat */
+        .footer-note {
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: #888;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            font-style: italic;
+        }
+
+        /* Animacions */
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(2deg);
+            }
+
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Elements decoratius de fons */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: moveBlob 10s infinite alternate;
+        }
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .blob-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 200, 0, 0.1);
+            animation-delay: -5s;
+        }
+
+        @keyframes moveBlob {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(30px, 30px);
+            }
+        }
+
+        /* Adaptació per a mòbils */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .logo {
+                width: 140px;
+            }
+
+            .cta-button {
+                padding: 18px 30px;
+                font-size: 1.2rem;
+                width: 80%;
+            }
+
+            .categories {
+                width: 90%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <!-- Logo -->
+        <img src="logo.png" alt="Penya L'Arjup" class="logo">
+
+        <h1>OPERACIÓ<br><span>PREMIS PATO</span><br>25/26</h1>
+
+        <p class="subtitle">
+            Va, no sigues rata i <strong>envia tot el material que tingues!</strong> 📂🔥
+        </p>
+
+        <div class="categories">
+            <p>🏆 <strong>Busquem material per a:</strong></p>
+            <p>🦆 El Patito Revelació</p>
+            <p>🤕 La Millor Caiguda de l'Any</p>
+            <p>🍻 El MVP de la Barra</p>
+            <p>✨ I alguna sorpresa més...</p>
+        </div>
+
+        <a href="https://driveuploader.com/upload/Abc04Gpy2n/" class="cta-button" target="_blank">
+            PUJAR FOTOS I VÍDEOS 🚀
+        </a>
+
+        <p class="footer-note">
+            *Tranquil, ningú pot veure el que puges excepte l'organització.<br>
+            Penya L'Arjup - Benicarló.
+        </p>
+
+        <p style="font-size: 0.7rem; color: #555; margin-top: 10px; opacity: 0.7;">
+            Nota: si coneixes la cançó que està sonant es que ja eres dels veteranos 👴🎶
+        </p>
+    </div>
+
+    <!-- AUDIO I CONTROL DE VOLUM -->
+    <div class="volume-control">
+        <span style="font-size: 1.2rem;">🔊</span>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.5">
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="dizzee-rascal-bonkers-lyrics-128-ytshorts.savetube.me.mp3" type="audio/mpeg">
+        El teu navegador no suporta l'element d'àudio.
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const audio = document.getElementById('bgMusic');
+            const slider = document.getElementById('volumeSlider');
+
+            // Configuració inicial
+            audio.volume = 0.5;
+
+            // Intentar reproduir automàticament
+            // Nota: Els navegadors moderns bloquegen l'autoplay amb so sense interacció prèvia.
+            // Això intentarà reproduir-ho, però si falla, esperarà un clic.
+            const playPromise = audio.play();
+
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Autoplay bloquejat. Esperant interacció de l'usuari.");
+                    // Afegim un listener a qualsevol clic a la pàgina per començar la música
+                    document.body.addEventListener('click', function () {
+                        audio.play();
+                    }, { once: true });
+                });
+            }
+
+            // Control de volum
+            slider.addEventListener('input', function () {
+                audio.volume = this.value;
+            });
+        });
+    </script>
+
+    <style>
+        .volume-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            border: 1px solid #eee;
+            transition: opacity 0.3s;
+        }
+
+        .volume-control:hover {
+            opacity: 1;
+        }
+
+        #volumeSlider {
+            width: 80px;
+            cursor: pointer;
+            accent-color: #FF0000;
+        }
+
+        /* Ocultar en mòbils molt petits si molesta, o fer-ho més petit */
+        @media (max-width: 350px) {
+            .volume-control {
+                padding: 5px;
+                top: 10px;
+                right: 10px;
+            }
+
+            #volumeSlider {
+                width: 50px;
+            }
+        }
+    </style>
+
+</body>
+
+</html>
