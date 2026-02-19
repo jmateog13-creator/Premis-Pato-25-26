@@ -1,0 +1,37 @@
+9 de febrer de 2026, 17:38
+Actua com un expert Sènior en Frontend i UI/UX. Vull crear una web estàtica anomenada "PATOFLIX" per a una festa d'amics ("Penya L'Arjup").
+
+Requisits Tècnics:
+1. **Tecnologia:** HTML5 + Tailwind CSS (importat via CDN) + Vanilla JS.
+2. **Estructura:** Tot en un sol fitxer `index.html` per simplicitat.
+3. **Icones:** FontAwesome (CDN).
+4. **Idioma:** Tot el text ha de ser en CATALÀ.
+
+Disseny Visual (Estil Netflix):
+- **Colors:** Fons negre fosc (#141414), Text blanc, Accents vermells (#E50914).
+- **Tipografia:** Sans-serif neta i moderna (Inter o Helvetica).
+- **Navbar:** Logotip "PATOFLIX" a l'esquerra, menú a la dreta (Inici, Nominats, El Kahoot).
+- **Hero Section (Portada):** Una imatge gran de fons amb el títol "PREMIS PATI 2026" i un botó de "Reproduir Intro".
+
+Contingut i Categories (Rows):
+Crea seccions horitzontals (sliders/files). Cada categoria ha de tenir exactament **4 targetes (thumbnails)** que representin els 4 candidats. Usa imatges de placeholder (com `https://placeholder.co/600x400/333/FFF?text=Candidat`) per ara.
+
+Les Categories són:
+1. 💃 Millor Ball
+2. 🎭 Millor Disfressa
+3. 😴 Millor Sobada
+4. 🦆 Premi Pato la Vida (Veterà més implicat)
+5. 🤕 Millor Caiguda
+6. 🏆 MVP
+7. 🐣 Patito Revelació
+8. 🎧 Millor DJ
+
+Funcionalitat del Modal (Pop-up):
+- Quan l'usuari faci clic a qualsevol de les 4 targetes d'una categoria, s'ha d'obrir un **MODAL** al centre (estil Netflix).
+- Dins del modal:
+    1. Un espai gran per al **Vídeo** (usa un `<iframe>` de YouTube o etiqueta `<video>` buida com a placeholder).
+    2. Títol del Candidat i una descripció curta i graciosa en català (fes servir "Lorem Ipsum" divertit o frases típiques de festa).
+    3. Un botó vermell molt gran que digui: "**VOTAR AL KAHOOT**" (que obri un link extern).
+    4. Botó de tancar (X).
+
+Si us plau, genera el codi complet, funcional i responsive per a mòbil.
