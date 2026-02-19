@@ -11,42 +11,132 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --netflix-red: #E50914;
+            --netflix-black: #141414;
+            --netflix-dark-gray: #181818;
+            --netflix-light-gray: #b3b3b3;
+        }
+
         body {
-            background-color: #141414;
+            background-color: var(--netflix-black);
             color: white;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .netflix-red {
-            color: #E50914;
+        /* Utilities */
+        .text-netflix-red {
+            color: var(--netflix-red);
         }
 
-        .netflix-bg-red {
-            background-color: #E50914;
+        .bg-netflix-red {
+            background-color: var(--netflix-red);
         }
 
-        .netflix-bg-dark {
-            background-color: #141414;
+        .bg-netflix-dark {
+            background-color: var(--netflix-black);
         }
 
-        /* Smooth transitions */
-        .card-transition {
-            transition: transform 0.3s ease, z-index 0s;
+        /* Navbar Gradient */
+        .nav-gradient {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 10%, rgba(0, 0, 0, 0) 100%);
         }
 
-        .card-transition:hover {
-            transform: scale(1.1);
-            z-index: 50;
+        /* Hero */
+        .hero-vignette {
+            background: linear-gradient(to top, #141414 0%, transparent 60%);
         }
 
-        /* Modal styling */
+        .hero-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Netflix Buttons */
+        .btn-play {
+            background-color: white;
+            color: black;
+            transition: all 0.2s;
+        }
+
+        .btn-play:hover {
+            background-color: rgba(255, 255, 255, 0.75);
+        }
+
+        .btn-more {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-more:hover {
+            background-color: rgba(109, 109, 110, 0.4);
+        }
+
+        /* Cards & Rows */
+        .row-container {
+            margin-bottom: 3vw;
+        }
+
+        .row-title {
+            font-size: 1.4vw;
+            color: #e5e5e5;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .row-title:hover .explore-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .explore-text {
+            font-size: 0.9vw;
+            color: #54b9c5;
+            vertical-align: bottom;
+            opacity: 0;
+            transition: all 0.3s;
+            transform: translateX(-10px);
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        /* Card Hover Effect */
+        .card-wrapper {
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            /* Smooth ease-out */
+            z-index: 1;
+        }
+
+        .card-wrapper:hover {
+            z-index: 99;
+            transform: scale(1.5);
+            transition-delay: 0.4s;
+            /* Netflix-like delay */
+        }
+
+        /* Ensure neighboring cards don't overlap weirdly - simple approach */
+        .card-wrapper:hover~.card-wrapper {
+            transform: translateX(25%);
+        }
+
+        /* Modal */
         .modal-overlay {
-            background: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
         }
 
-        /* Hide scrollbar but keep functionality */
+        .modal-content {
+            background-color: #181818;
+            border-radius: 8px;
+            /* Netflix radius */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+        }
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -54,11 +144,6 @@
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
-        }
-
-        /* Hero text shadow */
-        .hero-title {
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
         }
 
         /* Animations */
@@ -73,7 +158,7 @@
         }
 
         .animate-fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes zoomIn {
@@ -91,19 +176,6 @@
         .animate-zoom-in {
             animation: zoomIn 0.5s ease-out forwards;
         }
-
-        /* Expanded card effect */
-        .card-expanded {
-            transform: scale(1.6) translateY(-10%);
-            z-index: 100 !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-            width: 400px !important;
-            /* Fixed width when expanded to fit info */
-        }
-
-        .card-info-overlay {
-            background: linear-gradient(to right, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0.9) 40%, rgba(20, 20, 20, 0) 100%);
-        }
     </style>
 </head>
 
@@ -111,52 +183,79 @@
 
     <!-- Navbar -->
     <nav id="navbar"
-        class="fixed top-0 w-full z-50 flex items-center justify-between px-6 md:px-12 py-4 transition-colors duration-300">
+        class="fixed top-0 w-full z-50 flex items-center justify-between px-[4%] py-4 transition-all duration-500 nav-gradient">
         <div class="flex items-center space-x-8">
-            <h1 class="text-3xl font-black netflix-red tracking-tighter cursor-pointer"
-                onclick="window.scrollTo({top: 0, behavior: 'smooth'})">PREMIS PATO</h1>
-            <div class="hidden md:flex space-x-6 text-sm font-medium">
-                <a href="#" class="hover:text-gray-300 transition">Inici</a>
-                <a href="#categories" class="hover:text-gray-300 transition">Nominats</a>
-                <a href="upload.html" class="hover:text-gray-300 transition text-red-500 font-bold">Pujar Material</a>
-                <a href="https://kahoot.it" target="_blank" class="hidden hover:text-gray-300 transition">El Kahoot</a>
+            <!-- Netflix Logo Replacement -->
+            <h1 class="text-2xl md:text-3xl font-black text-[#E50914] tracking-tighter cursor-pointer shadow-red-glow"
+                style="text-shadow: 0 0 10px rgba(0,0,0,0.5);" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                PREMIS PATO</h1>
+            <div class="hidden md:flex space-x-5 text-sm font-normal text-gray-200">
+                <a href="#" class="font-bold text-white cursor-default">Inici</a>
+                <a href="#categories" class="hover:text-gray-400 transition">Sèries</a>
+                <a href="#categories" class="hover:text-gray-400 transition">Pel·lícules</a>
+                <a href="#categories" class="hover:text-gray-400 transition">Novetats i populars</a>
+                <a href="#categories" class="hover:text-gray-400 transition">La meva llista</a>
             </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <i class="fa-solid fa-search cursor-pointer"></i>
-            <i class="fa-solid fa-bell cursor-pointer"></i>
-            <div class="w-8 h-8 bg-blue-500 rounded cursor-pointer overflow-hidden">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User">
+        <div class="flex items-center space-x-5 text-sm text-white">
+            <i class="fa-solid fa-search cursor-pointer text-xl"></i>
+            <a href="upload.html"
+                class="hover:text-gray-300 transition text-[#E50914] font-bold uppercase text-xs border border-[#E50914] px-2 py-1 rounded hover:bg-[#E50914] hover:text-white">Pujar
+                Material</a>
+            <i class="fa-solid fa-bell cursor-pointer text-xl"></i>
+            <div class="flex items-center space-x-1 cursor-pointer group">
+                <div class="w-8 h-8 rounded overflow-hidden">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" class="object-cover">
+                </div>
+                <i class="fa-solid fa-caret-down text-xs transition-transform group-hover:rotate-180"></i>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <header class="relative h-[80vh] md:h-screen w-full overflow-hidden">
+    <header class="relative h-[85vh] w-full overflow-hidden">
+        <!-- Background Image -->
         <div class="absolute inset-0">
             <img src="https://images.unsplash.com/photo-1514525253361-b83f859b73c0?auto=format&fit=crop&q=80&w=1920"
-                alt="Hero Background" class="w-full h-full object-cover opacity-60">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-[#141414] via-transparent to-transparent"></div>
+                alt="Hero Background" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#141414] via-transparent to-transparent opacity-90">
+            </div>
+            <div class="absolute inset-0 hero-vignette"></div>
         </div>
 
-        <div class="relative z-10 h-full flex flex-col justify-center px-6 md:px-12 max-w-2xl pt-20">
-            <h2 class="text-lg md:text-2xl font-bold uppercase tracking-widest mb-2 opacity-90">Penya L'Arjup presenta
-            </h2>
-            <h1 class="text-5xl md:text-8xl font-black mb-6 hero-title leading-tight">PREMIS PATO 2026</h1>
-            <p class="text-lg md:text-xl mb-8 font-medium drop-shadow-md">
+        <!-- Hero Content -->
+        <div class="absolute top-[20%] left-[4%] max-w-xl z-20">
+            <!-- N Series Badge -->
+            <div class="flex items-center space-x-2 mb-4 animate-fade-in">
+                <span class="text-[#E50914] font-black text-2xl tracking-tighter">N</span>
+                <span class="text-gray-300 track-widest uppercase text-xs font-bold tracking-[0.2em]">P E L · L Í C U L
+                    A</span>
+            </div>
+
+            <h1 class="text-6xl md:text-8xl font-black mb-6 hero-shadow leading-none tracking-tight">PREMIS
+                PATO<br><span class="text-5xl">2026</span></h1>
+
+            <div class="flex items-center space-x-4 mb-4 text-white font-bold text-shadow">
+                <span class="text-green-400 font-bold">98% de coincidència</span>
+                <span class="text-gray-300">2026</span>
+                <span class="border border-gray-500 px-1 text-xs">18+</span>
+                <span class="text-gray-300">1h 50m</span>
+            </div>
+
+            <p class="text-lg text-white mb-8 hero-shadow line-clamp-3 w-[90%]">
                 La gran gala dels millors (i pitjors) moments de l'any. Prepara't per al veredicte final al Kahoot més
-                èpic de Benicarló.
+                èpic de Benicarló. Un esdeveniment on la dignitat és opcional.
             </p>
-            <div class="flex space-x-4">
+
+            <div class="flex space-x-3">
                 <button onclick="playIntro()"
-                    class="bg-white text-black px-8 py-3 rounded font-bold flex items-center space-x-2 hover:bg-gray-200 transition">
-                    <i class="fa-solid fa-play"></i>
-                    <span>Reproduir Intro</span>
+                    class="btn-play px-8 py-2 md:py-3 rounded md:rounded-md font-bold flex items-center space-x-3 text-lg">
+                    <i class="fa-solid fa-play text-2xl"></i>
+                    <span>Reproduir</span>
                 </button>
                 <button
-                    class="bg-gray-500 bg-opacity-50 text-white px-8 py-3 rounded font-bold flex items-center space-x-2 hover:bg-opacity-40 transition">
-                    <i class="fa-solid fa-circle-info"></i>
+                    class="btn-more px-8 py-2 md:py-3 rounded md:rounded-md font-bold flex items-center space-x-3 text-lg opacity-90">
+                    <i class="fa-solid fa-circle-info text-2xl"></i>
                     <span>Més informació</span>
                 </button>
             </div>
@@ -164,7 +263,7 @@
     </header>
 
     <!-- Content Sections (Rows) -->
-    <main id="categories" class="relative z-10 -mt-20 md:-mt-40 space-y-12 pb-20">
+    <main id="categories" class="relative z-10 -mt-10 pb-20 pl-[4%] space-y-8 overflow-x-hidden">
         <!-- Rows will be injected by JavaScript -->
     </main>
 
@@ -190,54 +289,81 @@
 
     <!-- Modal -->
     <div id="modal"
-        class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 modal-overlay animate-fade-in">
-        <div class="bg-[#181818] w-full max-w-4xl rounded-xl overflow-hidden shadow-2xl relative">
+        class="fixed inset-0 z-[100] hidden flex items-start justify-center pt-10 pb-0 overflow-y-auto modal-overlay animate-fade-in">
+        <div class="modal-content w-full max-w-4xl relative overflow-hidden mb-10 mx-4">
+
+            <!-- Close Button -->
             <button onclick="closeModal()"
-                class="absolute top-4 right-4 z-50 bg-black bg-opacity-50 w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-70 transition">
-                <i class="fa-solid fa-xmark text-xl text-white"></i>
+                class="absolute top-4 right-4 z-50 bg-[#181818] w-9 h-9 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
             <!-- Video/Placeholder Hero in Modal -->
             <div class="aspect-video w-full bg-black relative">
                 <div id="modalVideoContainer" class="w-full h-full flex items-center justify-center bg-black relative">
-                    <i class="fa-solid fa-clapperboard text-6xl text-gray-700"></i>
-
-                    <!-- Fullscreen Button (Inside to stay visible) -->
-                    <div class="absolute bottom-4 left-4 z-[70]">
-                        <button onclick="toggleFullscreen()" id="fullscreenBtn"
-                            class="bg-black bg-opacity-50 w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-70 transition border border-gray-600">
-                            <i class="fa-solid fa-expand text-white"></i>
-                        </button>
-                    </div>
+                    <!-- Content injected here -->
+                </div>
+                <!-- Vignette for text readability -->
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent pointer-events-none">
                 </div>
 
-                <div class="absolute bottom-10 left-10 right-10 flex space-x-4 hidden">
-                    <a id="voteButton" href="#" target="_blank"
-                        class="netflix-bg-red text-white px-10 py-4 rounded text-xl font-black uppercase tracking-wider hover:opacity-90 transition flex items-center space-x-2">
-                        <i class="fa-solid fa-check-to-slot"></i>
-                        <span>VOTAR AL KAHOOT</span>
-                    </a>
+                <!-- Title Overlay in Preview -->
+                <div class="absolute bottom-[5%] left-[5%] max-w-[60%] pointer-events-none">
+                    <h2 id="modalTitle" class="text-4xl md:text-5xl font-black mb-4 text-shadow stroke-black">Nom del
+                        Candidat</h2>
+                    <div class="flex items-center space-x-3 pointer-events-auto">
+                        <button onclick="toggleFullscreen()"
+                            class="bg-white text-black px-6 py-1.5 rounded font-bold flex items-center space-x-2 hover:bg-opacity-80 transition">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Reproduir</span>
+                        </button>
+                        <button
+                            class="border border-gray-400 bg-[#2a2a2a] bg-opacity-60 text-white w-9 h-9 rounded-full flex items-center justify-center hover:border-white transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                        <button
+                            class="border border-gray-400 bg-[#2a2a2a] bg-opacity-60 text-white w-9 h-9 rounded-full flex items-center justify-center hover:border-white transition">
+                            <i class="fa-regular fa-thumbs-up"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Info in Modal -->
-            <div class="p-10 grid md:grid-cols-3 gap-8">
+            <div class="px-10 py-6 grid md:grid-cols-3 gap-8 text-sm">
                 <div class="md:col-span-2 space-y-4">
-                    <div class="flex items-center space-x-2 text-green-500 font-bold mb-2">
-                        <span>98% de coincidència</span>
-                        <span class="border border-gray-600 px-1 text-[10px] text-gray-400">18+</span>
-                        <span>2026</span>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="text-green-400 font-bold">98% de coincidència</span>
+                        <span class="text-gray-400">2026</span>
+                        <span class="border border-gray-500 px-1 text-[10px] text-gray-300">18+</span>
+                        <span class="text-gray-300">1 temporada</span>
                     </div>
-                    <h2 id="modalTitle" class="text-4xl font-black mb-2">Nom del Candidat</h2>
-                    <p id="modalDescription" class="text-lg text-gray-300 leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam.
+
+                    <p id="modalDescription" class="text-base text-white leading-relaxed font-light">
+                        Lorem ipsum dolor sit amet.
                     </p>
                 </div>
-                <div class="space-y-4 text-sm">
-                    <p><span class="text-gray-500">Repartiment:</span> Penya L'Arjup, Tots nosaltres.</p>
-                    <p><span class="text-gray-500">Gèneres:</span> Festa, Humor, Benicarló.</p>
-                    <p><span class="text-gray-500">Aquest títol és:</span> Divertit, Emblemàtic, Mític.</p>
+                <div class="space-y-3">
+                    <p><span class="text-gray-500">Repartiment:</span> <span
+                            class="text-white hover:underline cursor-pointer">Penya L'Arjup</span>, <span
+                            class="text-white hover:underline cursor-pointer">Tots nosaltres</span></p>
+                    <p><span class="text-gray-500">Gèneres:</span> <span
+                            class="text-white hover:underline cursor-pointer">Festa</span>, <span
+                            class="text-white hover:underline cursor-pointer">Humor</span></p>
+                    <p><span class="text-gray-500">Aquest títol és:</span> <span class="text-white">Divertit</span></p>
+                </div>
+            </div>
+
+            <!-- Kahoot CTA -->
+            <div class="px-10 pb-10">
+                <div class="border-t border-gray-700 pt-6 mt-4">
+                    <h3 class="text-xl font-bold mb-4">Vota per aquest candidat</h3>
+                    <a id="voteButton" href="#" target="_blank"
+                        class="bg-[#E50914] text-white px-6 py-3 rounded font-bold uppercase tracking-wider hover:bg-red-700 transition inline-flex items-center space-x-2">
+                        <i class="fa-solid fa-check-to-slot"></i>
+                        <span>Anar al Kahoot</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -257,26 +383,31 @@
                     {
                         name: "ANATOMIA D'UN 'PERREO'",
                         video: "images/baile/baile1-sepi.mov",
+                        poster: "images/logos/ball1.jpg",
                         description: "\"Brutal. Simplement brutal. Sepi demostra que el reggaeton no es balla, se sobreviu. Una lliçó magistral de llibertat pèlvica no apta per a menors d'edat (ni per a traumatòlegs).\""
                     },
                     {
                         name: "L'ENIGMA D'ALFANG",
                         video: "images/baile/baile2-alfang.mov",
+                        poster: "images/logos/ball2.jpg",
                         description: "\"Inclassificable. Ni és dansa, ni són arts marcials, ni és una rampa a la cama. És una 'performance' tan avançada al seu temps que el cervell humà, simplement, no la pot processar. Art abstracte en estat pur.\""
                     },
                     {
                         name: "L'ECLIPSI TAURÍ",
                         video: "images/baile/baile3-bel.mp4",
+                        poster: "images/logos/ball3.jpg",
                         description: "\"Colossal. Amb la seva envergadura amenaçava de tapar la lluna, però la seva passió pel folklore va acabar il·luminant la nit. Una interpretació d'alt nivell. Literalment d'alt nivell. Calia vigilar els llums del sostre.\""
                     },
                     {
                         name: "VELOCITAT ABSURDA",
                         video: "images/baile/baile4-chino.mp4",
+                        poster: "images/logos/ball4.jpg",
                         description: "\"Magistral. Simplement magistral. Un desplegament d'energia cinètica totalment desubicada que et deixa sense alè. Vestit per a recollir un Oscar, ballant com si s'acabés el món en cinc segons. No hi ha paraules.\""
                     },
                     {
                         name: "Honorable Mention: EL TOY BOY DE LA TERCERA EDAT",
                         video: "images/baile/mencion-fogachopasodoble.mp4",
+                        poster: "images/logos/ball5.jpg",
                         description: "\"Ella té l'experiència, ell té la barra lliure. Junts desafien la gravetat i la vergonya aliena en un 'agarrao' mortal.\""
                     }
                 ]
@@ -288,26 +419,31 @@
                     {
                         name: "Mercadona, Mercadona",
                         image: "images/disfraz/disfraz1-mercadona.jpg",
+                        poster: "images/logos/disfrazmercadona.jpg",
                         description: "\"Magistral. Simplement magistral. Costa de creure que tant de talent i glamour càpiguen en una bossa de 15 cèntims.\""
                     },
                     {
                         name: "BAYWATCH BENICARLÓ",
                         image: "images/disfraz/disfraz2-socorristas.jpeg",
+                        poster: "images/logos/disfrazvigilante.jpg",
                         description: "\"Heroïnes. La seva tècnica de respiració boca a boca (amb ginebra-aquarius) hauria de ser estudiada a les universitats. Mai ens havíem sentit tan segurs.\""
                     },
                     {
                         name: "EL CAVALL DE TROIA",
                         image: "images/disfraz/dusfraz-victor.jpeg",
+                        poster: "images/logos/disfrazmujer.jpg",
                         description: "\"Històric. Ni el mateix Ulisses va idear una estratègia tan brillant per colar-se on no el demanaven. Una 'masterclass' de supervivència i poca vergonya per aconseguir un plat calent a taula.\""
                     },
                     {
                         name: "El bucaner desubicat",
                         image: "images/disfraz/dusfraz4-bueso.jpeg",
+                        poster: "images/logos/disfrazpirata.jpg",
                         description: "\"Incomprensible. Magistral. Una decisió de vestuari totalment desproveïda de context, lògica o justificació. L'esforç titànic per ser pirata 'perquè sí' és història d'aquesta Penya.\""
                     },
                     {
                         name: "Honorable Mention: EL SOMNI DE LES 6 A.M.",
                         image: "images/disfraz/mencion-marakebab.jpeg",
+                        poster: "images/logos/disfressamention.jpg",
                         description: "\"Deliciosa. Simplement deliciosa. Una obra mestra del realisme que fa venir gana només de mirar-la. El detall de l'embolcall metàl·lic per 'mantenir l'escalfor' és d'un geni incomprès.\""
                     }
                 ]
@@ -319,26 +455,31 @@
                     {
                         name: "El Faquir del Motor",
                         image: "images/sobada/sobada1-tractor.jpeg",
+                        poster: "images/logos/sobada1.jpg",
                         description: "\"Commovedor. Una peça de neo-realisme on la fatiga humana venç la fredor i la duresa del metall. Aconseguir la fase REM amb el clatell repenjat a la palanca de canvis d'un Land Rover és poesia pura.\""
                     },
                     {
                         name: "LA BELLA DORMENT",
                         image: "images/sobada/sobada2-aroa.jpeg",
+                        poster: "images/logos/sobada2.jpg",
                         description: "\"Una reinterpretació contemporània del conte on el castell de fades se substitueix per qualsevol racó de la Penya. Aconseguir aquesta pau interior amb el volum de la música al màxim és digne d'elogi.\""
                     },
                     {
                         name: "EL LLIT FRIGORÍFIC",
                         image: "images/sobada/sobada3-gemma.jpeg",
+                        poster: "images/logos/sobada3.jpg",
                         description: "\"No hi ha paraules per descriure tal desplegament d'adaptabilitat tèrmica. Ignorar el fred polar d'un arcó de gelats per abraçar la inconsciència ja és història d'aquesta Penya.\""
                     },
                     {
                         name: "CAMUFLATGE TÀCTIC",
                         image: "images/sobada/sobada4-juan antonio.jpeg",
+                        poster: "images/logos/sobada4.jpg",
                         description: "\"Una tècnica de camuflatge digna de les forces especials per evitar ser molestat durant la fase REM. La fusió perfecta entre l'esgotament humà i la flora autòctona. Un instint de supervivència impecable.\""
                     },
                     {
                         name: "Honorable Mention: EL SON ETERN: EL RETORN",
                         image: "images/sobada/mencion-pedro.jpeg",
+                        poster: "images/logos/sobadamention.jpg",
                         description: "\"Una nova entrega de la franquícia més previsible i reconfortant de la Penya. Trobar en Pedro despert a altes hores de la matinada ja es considera un mite urbà. La constància elevada a categoria d'art d'autor.\""
                     }
                 ]
@@ -350,26 +491,31 @@
                     {
                         name: "PUNKY SI, VEGETA TAMBÉ",
                         image: "images/Patoalavida/patoalavida1-valle.jpeg",
+                        poster: "images/logos/patalavidapunky.jpg",
                         description: "\"Un esperit lliure que ha sabut conjugar l'anarquia del punk amb el respecte pel regne vegetal enmig d'un oceà de carn a la brasa. Pura història viva.\""
                     },
                     {
                         name: "EL CANGUR DE L'ARJUP",
                         image: "images/Patoalavida/patoalavida2-alexis.jpeg",
+                        poster: "images/logos/patoalavidacanggur.jpg",
                         description: "\"Qui necessita genolls nous quan tens el ritme al cos i l'ànima d'un saltimbanqui? Una llegenda que mai baixa el llistó.\""
                     },
                     {
                         name: "MIAMI VICE: BENICARLÓ CONNECTION",
                         image: "images/Patoalavida/patoalavida3-jeremy.jpeg",
+                        poster: "images/logos/patoalavidamiami.jpg",
                         description: "\"Un desplegament de glamour internacional que uneix les platges de Florida amb el xivarri de l'Arjup. La gorra no és un accessori, és un escut diplomàtic contra el 'jet lag'.\""
                     },
                     {
                         name: "PÀNIC A LA CABINA",
                         image: "images/Patoalavida/patoalavida4-dijs.jpeg",
+                        poster: "images/logos/patoalavidadj.jpg",
                         description: "\"Veure tres senyors de gairebé 40 anys moure's amb l'energia frenètica d'uns adolescents de 20 és un miracle de la ciència...o dels cubates.\""
                     },
                     {
                         name: "Honorable Mention: El Capo / El Patriarca / El Messies / El Puto Amo / El Gran Timoner / El Cèsar / L'Alfa i l'Omega / L'Arquitecte del Caos / The Boss / Andresw",
                         image: "images/Patoalavida/horablepatoalavida-andres.jpeg",
+                        poster: "images/logos/patoalavidahonorable.jpg",
                         description: "\"Tot el que banya la llum de la carpa és el seu regne. Anys de saviesa, paciència infinita i gestió paternalista que han mantingut aquest ramat de bous unit sota una mateixa bandera.\""
                     }
                 ]
@@ -381,31 +527,35 @@
                     {
                         name: "EL SALT DE LA FE",
                         video: "images/caida/caida1-claudia.mov",
+                        poster: "images/logos/caiguda1.jpg",
                         description: "\"No hi ha paraules per descriure la paràbola perfecta des de l'alt de la barra fins a la col·lisió definitiva. Una actuació que trenca motlles... i paviments.\""
                     },
                     {
                         name: "RESIDU D'ALTA GAMMA",
                         video: "images/caida/caida2-joancorral.MOV",
+                        poster: "images/logos/caiguda2.jpg",
                         description: "\"Decidir que el teu lloc al món és el cubell de la brossa és un acte poètic contra el consumisme. Un 'Oscar' (literalment) a la millor interpretació de deixalla humana.\""
                     },
                     {
                         name: "EL VOL FINAL",
                         video: "images/caida/caida3-adrian.mp4",
+                        poster: "images/logos/caiguda3.jpg",
                         description: "\"Que va començar com un ascens cap a la divinitat es va transformar en una triple rotació asíncrona amb doble tirabuixó invertit de caràcter suborbital i paràbola hiperbòlica. Una maniobra executada amb la supèrbia d'un déu i la coordinació motriu d'un sac de pataques caient d'un cinquè pis.\""
                     },
                     {
                         name: "L'HOME QUE VA BESAR EL TERRA (DUES VEGADES)",
                         video: "images/caida/caida4-bueso.mp4",
+                        poster: "images/logos/caiguda4.jpg",
                         description: "\"Caure del toro mecànic 2 vegades no és un accident, és una declaració d'intencions. Un primer vol per a temptejar la gravetat i un segon aterratge forçós per a confirmar que el llom té memòria.\""
                     },
                     {
                         name: "Honorable Mention: EX-PRESIDENT: L'ÚLTIMA RUTA",
                         image: "images/caida/honorablecaida-alan.jpeg",
+                        poster: "images/logos/caigudahonorable.jpg",
                         description: "\"L'últim gran acte institucional de l'EX-PRESIDENT no va ser un discurs, va ser una caiguda lliure des de les altures d'un carro de Mercadona. L'EX-PRESIDENT va decidir que la millor manera de dir adéu era amb una pirueta involuntària. L'EX-PRESIDENT ha caigut, llarga vida a l'EX-PRESIDENT.\""
                     }
                 ]
             },
-            { id: 6, name: "🏆 MVP", candidates: ["Candidat 1", "Candidat 2", "Candidat 3", "Candidat 4"] },
             {
                 id: 7,
                 name: "🐣 Patito Revelació",
@@ -413,26 +563,31 @@
                     {
                         name: "QUAN EL QUE T'AGRADE ÉS DE L'ALTRA PENYA",
                         video: "images/revelacion/revelacion1-ivette.mov",
+                        poster: "images/logos/revelacion1.jpg",
                         description: "\"Creuar la línia enemiga per tirar els trastos a algú d'una altra penya mereix un respecte absolut. La traïció més dolça, arriscada i justificada de l'any. Un debut estel·lar.\""
                     },
                     {
                         name: "El Casanova dels Fogons",
                         image: "images/revelacion/revelacion2-cucala.jpeg",
+                        poster: "images/logos/revelacion2.jpg",
                         description: "\"No hi ha paraules per descriure aquest desplegament de talent transversal. Et clava un triple, et cuina un risotto perfecte i et roba el cor abans d'arribar a les postres. Una 'masterclass' de seducció polivalent. Brillants.\""
                     },
                     {
                         name: "EL C.E.O. DE LA FESTA",
                         image: "images/revelacion/revelacion3-mariojaro.jpeg",
+                        poster: "images/logos/revelacion3.jpg",
                         description: "\"Una ment mestra de la logística atrapada en el cos d'un jove de 20 anys. Gestionar el caos d'una Falla i la bogeria d'una Penya amb la mateixa fredor que un alt executiu de Wall Street és un do diví. El Padrí precoç. Magistral.\""
                     },
                     {
                         name: "Clausurazo d'estiu",
                         image: "images/revelacion/revelacion4-jimenezyquerol.jpeg",
+                        poster: "images/logos/revelacion4.jpg",
                         description: "\"Dos actius que han vingut a elevar la mitjana de consum de la penya fins a límits perillosos per a l'estoc. La seva set no coneix fronteres ni colors.\""
                     },
                     {
                         name: "Honorable Mention: L'EFECTE DAMA",
                         video: "images/revelacion/revelacion-honorablemention.mov",
+                        poster: "images/logos/revelacionhonorable.jpg",
                         description: "\"Un bucle d'amistat que acaba en fitxatge col·lectiu sota les ordres de la Dama. El magnetisme personal convertit en alta traïció a les penyes d'origen.\""
                     }
                 ]
@@ -444,30 +599,36 @@
                     {
                         name: "BOMBER DE RITME CONSTANT",
                         image: "images/djs/dj1-salva.jpeg",
+                        poster: "images/logos/dj1.jpg",
                         description: "\"El House més pur servit per algú que sap perfectament el que és la calor de veritat. Una sessió que hauria de ser obligatòria en tots els parcs de bombers.\""
                     },
                     {
                         name: "PINCHANDO BAJO LA LLUVIA",
                         image: "images/djs/dj2-harru.jpeg",
+                        poster: "images/logos/dj2.jpg",
                         description: "\"Ni el Diluvi de l'Arca de Noè podria apagar el carisma d'algú que prefereix la possibilitat d'electrocutar-se abans que deixar de fer ballar a la gent.\""
                     },
                     {
                         name: "DJS PER BLUETOOTH",
                         video: "images/djs/dj3.gemmai juan.mp4",
+                        poster: "images/logos/dj3.jpg",
                         description: "\"Un desplegament de telequinesi rítmica on el contacte físic és un concepte totalment arcaic. Dominar la voluntat de la pista a distància, sense tocar ni un sol 'fader'.\""
                     },
                     {
                         name: "EL FITXATGE GALÀCTIC",
                         image: "images/djs/dj4-dalmau.jpeg",
+                        poster: "images/logos/dj4.jpg",
                         description: "\"Una futura promesa amb una clàusula de rescissió que faria tremolar a Florentino Pérez. Criat entre senyals de 'Stop' i embragatges, aquest DJ no punxa música: condueix la pista.\""
                     },
                     {
                         name: "Honorable Mention: FREQÜÈNCIA HALLEY: EL METEORIT ARRÍTMIC",
                         image: "images/djs/honorabledj-bueso.jpeg",
+                        poster: "images/logos/honorabledj.jpg",
                         description: "\"Veure'l darrere dels plats és presenciar un miracle que desafia les lleis de la probabilitat estadística. Ha decidit que el seu talent és massa preciós per al consum diari, reservant-lo per a un sol impacte devastador per cada canvi d'era.\""
                     }
                 ]
-            }
+            },
+            { id: 6, name: "🏆 MVP", candidates: ["Candidat 1", "Candidat 2", "Candidat 3", "Candidat 4"] }
         ];
 
         const placeholderDescriptions = [
@@ -486,62 +647,92 @@
         // Render Categories and Cards
         categories.forEach((cat, index) => {
             const row = document.createElement('section');
-            row.className = "px-6 md:px-12 space-y-4";
+            // Added hover:z-40 to ensure the active row is above others
+            row.className = "row-container mb-4 relative px-[4%] hover:z-40 transition-all duration-300";
+
+            const isMVP = cat.id === 6; // Check if this is the MVP category
+
+            // 1. Sort candidates: Move "Honorable Mention" to the start
+            const sortedCandidates = [...cat.candidates].sort((a, b) => {
+                const nameA = (typeof a === 'object' ? a.name : a).toLowerCase();
+                const nameB = (typeof b === 'object' ? b.name : b).toLowerCase();
+                if (nameA.includes('honorable mention') || nameA.includes('mencion')) return -1;
+                if (nameB.includes('honorable mention') || nameB.includes('mencion')) return 1;
+                return 0; // Keep original order for others
+            });
 
             // Generate cards HTML
-            const cardsHtml = cat.candidates.map((cand, i) => {
+            const cardsHtml = sortedCandidates.map((cand, i) => {
                 const isObj = typeof cand === 'object';
                 const name = isObj ? cand.name : cand;
-                const image = isObj && cand.image ? cand.image : `https://placehold.co/600x400/181818/E50914?text=${cat.name.split(' ').pop()}+${i + 1}`;
-
+                const image = isObj && cand.image ? cand.image : `https://placehold.co/600x337/181818/E50914?text=${cat.name.split(' ').pop()}+${i + 1}&font=roboto`;
                 const desc = isObj ? cand.description : "";
                 const video = isObj && cand.video ? cand.video : "";
+                const poster = isObj && cand.poster ? cand.poster : "";
 
-                // Determine media content (Video thumbnail or Image)
-                const mediaContent = video
-                    ? `<video src="${video}#t=0.1" class="w-full h-full object-cover rounded shadow-lg" preload="metadata" muted></video>`
-                    : `<img src="${image}" alt="${name}" class="w-full h-full object-cover rounded shadow-lg">`;
+                // Alternating Colors: Even = White, Odd = Red
+                const textColorClass = i % 2 === 0 ? 'text-white' : 'text-[#E50914]';
+
+                // MVP Highlight Logic
+                const cardSizeClass = isMVP ? 'w-full' : 'w-[45vw] md:w-[15vw]';
+                const textSizeClass = isMVP ? 'text-2xl md:text-4xl' : 'text-sm md:text-base'; // Even larger text for MVP grid
+                const borderClass = isMVP ? 'border-yellow-500 hover:border-yellow-300' : 'border-[#333] hover:border-white';
+                const shadowClass = isMVP ? 'shadow-[0_0_15px_rgba(234,179,8,0.3)] hover:shadow-[0_0_25px_rgba(234,179,8,0.6)]' : '';
+                const marginClass = isMVP ? '' : 'mx-1'; // No margin for grid items
+
+                // Simplified Card Generation for "Spoiler-Free" Text-Only Mode
+                // If poster exists, show it blurred behind text
+                const backgroundHtml = poster
+                    ? `<div class="absolute inset-0 bg-cover bg-center blur-[3px] opacity-70 transition-transform duration-500 group-hover:scale-110" style="background-image: url('${poster}');"></div>
+                       <div class="absolute inset-0 bg-black/60 group-hover:bg-black/50 transition-colors"></div>`
+                    : '';
 
                 return `
-                        <div onclick="handleCardClick(this)"
-                             ondblclick="openModalFromCard(this)"
+                        <div class="card-wrapper flex-none ${cardSizeClass} aspect-video bg-[#141414] rounded-sm relative group overflow-hidden ${marginClass} hover:z-50 origin-center transition-transform duration-300 hover:scale-[1.03] cursor-pointer border ${borderClass} ${shadowClass}"
                              data-category="${cat.name}"
                              data-name="${name}"
                              data-image="${image}"
                              data-video="${video}"
+                             data-poster="${poster}"
                              data-desc="${desc.replace(/"/g, '&quot;')}"
-                             class="flex-none w-40 md:w-72 aspect-video bg-[#333] rounded cursor-pointer card-transition relative group overflow-hidden">
-                            ${mediaContent}
-                            
-                            <!-- Normal Hover Overlay -->
-                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center pointer-events-none">
-                                <i class="fa-solid fa-circle-play text-4xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                            </div>
+                             onclick="openModalFromCard(this, event)"
+                        >
+                            <!-- Background Image (Blurred) -->
+                            ${backgroundHtml}
 
-                            <!-- Expanded Content (Single Click) -->
-                            <div class="expanded-content absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col justify-center p-6 card-info-overlay">
-                                <div class="max-w-[80%]">
-                                    <h4 class="text-xs md:text-xl font-black leading-tight mb-1 text-red-600">${cat.name}</h4>
-                                    <h5 class="text-sm md:text-lg font-bold mb-2 line-clamp-2">${name}</h5>
-                                    <div class="flex space-x-2">
-                                        <button onclick="event.stopPropagation(); openModalFromCard(this.closest('[data-name]'))" class="bg-white text-black text-[8px] md:text-xs py-1.5 px-4 rounded font-black flex items-center space-x-1 hover:bg-gray-200 transition">
-                                            <i class="fa-solid fa-play text-[8px]"></i>
-                                            <span>VEURE GRAN</span>
-                                        </button>
-                                    </div>
-                                </div>
+                            <!-- Text-Only Content -->
+                            <div class="absolute inset-0 flex items-center justify-center p-4 relative z-10">
+                                <h4 class="${textColorClass} text-center font-bold ${textSizeClass} leading-tight group-hover:text-white transition-colors uppercase tracking-widest text-shadow">${name}</h4>
                             </div>
                         </div>
                     `;
             }).join('');
 
+            // Conditionals for Container and Navigation
+            const containerClass = isMVP
+                ? "grid grid-cols-1 md:grid-cols-2 gap-6 py-4" // 2x2 Grid
+                : "flex overflow-x-auto space-x-0 py-8 -my-8 no-scrollbar scroll-smooth px-0 row-scroll-container";
+
+            const chevrons = isMVP ? '' : `
+                 <button onclick="scrollRow(this, -1)" class="absolute left-0 top-0 bottom-0 w-10 bg-black/50 z-20 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity cursor-pointer hover:bg-black/70 rounded-r border-0 outline-none">
+                    <i class="fa-solid fa-chevron-left text-2xl text-white"></i>
+                 </button>
+                 <button onclick="scrollRow(this, 1)" class="absolute right-0 top-0 bottom-0 w-10 bg-black/50 z-20 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity cursor-pointer hover:bg-black/70 rounded-l border-0 outline-none">
+                    <i class="fa-solid fa-chevron-right text-2xl text-white"></i>
+                 </button>
+            `;
+
             row.innerHTML = `
-                <h3 class="text-xl md:text-2xl font-bold hover:text-gray-300 transition cursor-pointer flex items-center md:inline-flex group">
+                <h3 class="row-title group block mb-2 px-1 text-white font-bold ${isMVP ? 'text-3xl text-yellow-500 mb-6 text-center' : ''}">
                     ${cat.name}
-                    <span class="text-xs ml-4 netflix-red opacity-0 group-hover:opacity-100 transition-opacity">Explorar més ></span>
+                    ${!isMVP ? '<span class="explore-text text-gray-400 font-normal text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity">Explorar tot <i class="fa-solid fa-chevron-right text-xs"></i></span>' : ''}
                 </h3>
-                <div class="flex overflow-x-auto space-x-2 md:space-x-4 pb-8 no-scrollbar scroll-smooth">
-                    ${cardsHtml}
+                <div class="relative group/slider">
+                    <!-- Cards Container -->
+                    <div class="${containerClass}">
+                        ${cardsHtml}
+                    </div>
+                    ${chevrons}
                 </div>
             `;
             mainContainer.appendChild(row);
@@ -550,12 +741,22 @@
         // Navbar scroll effect
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                nav.classList.add('bg-[#141414]', 'shadow-lg');
+            if (window.scrollY > 20) {
+                nav.classList.add('bg-[#141414]');
+                nav.classList.remove('nav-gradient');
             } else {
-                nav.classList.remove('bg-[#141414]', 'shadow-lg');
+                nav.classList.remove('bg-[#141414]');
+                nav.classList.add('nav-gradient');
             }
         });
+
+        function scrollRow(btn, direction) {
+            const container = btn.parentElement.querySelector('.row-scroll-container');
+            const scrollAmount = window.innerWidth * 0.7;
+            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        // Helper functions removed as they were for the old hover/expand logic.
 
         // Modal Logic
         const modal = document.getElementById('modal');
@@ -564,87 +765,133 @@
         const modalVideoContainer = document.getElementById('modalVideoContainer');
         const voteButton = document.getElementById('voteButton');
 
-        let expandedCard = null;
+        function openModalFromCard(el, event) {
+            if (event) event.stopPropagation();
 
-        function handleCardClick(el) {
-            // If already expanded, don't do anything on single click (let double click handle modal)
-            if (el.classList.contains('card-expanded')) return;
-
-            // Close any previously expanded card
-            if (expandedCard) {
-                closeExpandedCard(expandedCard);
-            }
-
-            el.classList.add('card-expanded');
-            el.querySelector('.expanded-content').classList.remove('opacity-0', 'pointer-events-none');
-            expandedCard = el;
-
-            // Close on click outside
-            const clickOutside = (e) => {
-                if (!el.contains(e.target)) {
-                    closeExpandedCard(el);
-                    document.removeEventListener('click', clickOutside);
-                }
-            };
-            setTimeout(() => document.addEventListener('click', clickOutside), 100);
-        }
-
-        function closeExpandedCard(el) {
-            if (!el) return;
-            el.classList.remove('card-expanded');
-            el.querySelector('.expanded-content').classList.add('opacity-0', 'pointer-events-none');
-            if (expandedCard === el) expandedCard = null;
-        }
-
-        function openModalFromCard(el) {
             const category = el.dataset.category;
             const name = el.dataset.name;
             const image = el.dataset.image;
             const video = el.dataset.video;
+            const poster = el.dataset.poster;
             const desc = el.dataset.desc || placeholderDescriptions[Math.floor(Math.random() * placeholderDescriptions.length)];
 
-            modalTitle.innerText = `${category}: ${name}`;
+            modalTitle.innerText = name;
             modalDescription.innerText = desc;
             voteButton.href = "https://kahoot.it";
 
-            // If it's a generated placeholder image or a real image
-            if (video) {
-                modalVideoContainer.innerHTML = `
+            // SPOILER STATE IN MODAL: Always show Black + Play Button first
+            // We store the media source in the button's dataset or closure
+            // Escaping quotes for the onclick function
+            const safeVideo = video ? video.replace(/'/g, "\\'") : '';
+            const safeImage = image ? image.replace(/'/g, "\\'") : '';
+            const safeName = name ? name.replace(/'/g, "\\'") : '';
+
+            // Dynamic background style
+            // If poster exists -> bg-cover bg-center with image
+            // Else -> bg-black
+            const bgStyle = poster ? `background-image: url('${poster}'); background-size: cover; background-position: center;` : 'background-color: black;';
+            const overlayClass = poster ? 'bg-black/60' : ''; // Dark overlay if image present
+
+            modalVideoContainer.innerHTML = `
+                <div class="w-full h-full flex items-center justify-center relative group" style="${bgStyle}">
+                    ${poster ? `<div class="absolute inset-0 ${overlayClass}"></div>` : ''}
+                    <button onclick="playModalMedia('${safeVideo}', '${safeImage}', '${safeName}')" class="bg-white text-black rounded-full w-16 h-16 flex items-center justify-center hover:bg-gray-200 transition-transform hover:scale-110 shadow-xl z-20">
+                        <i class="fa-solid fa-play text-2xl ml-1"></i>
+                    </button>
+                    <!-- Background hint? No, pure black requested -->
+                    <p class="absolute bottom-10 text-gray-500 text-xs uppercase tracking-widest z-10">Prem per desvelar</p>
+                    
+                    <!-- Pre-Play Fullscreen Button -->
+                    <div class="absolute bottom-4 right-4 z-[70]">
+                        <button onclick="toggleFullscreen()" id="fullscreenBtn"
+                            class="bg-black bg-opacity-50 w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-70 transition border border-gray-600">
+                            <i class="fa-solid fa-expand text-white"></i>
+                        </button>
+                    </div>
+                </div>`;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Focus play button for accessibility
+            const playBtn = modalVideoContainer.querySelector('button');
+            if (playBtn) playBtn.focus();
+        }
+
+        function playModalMedia(videoSrc, imageSrc, name) {
+            const container = document.getElementById('modalVideoContainer');
+
+            if (videoSrc) {
+                container.innerHTML = `
                     <div class="w-full h-full bg-black flex items-center justify-center relative group">
-                        <video id="modalVideoPlayer" class="w-full h-full object-contain" controls>
-                            <source src="${video}" type="video/mp4">
+                        <video id="modalVideoPlayer" class="w-full h-full object-contain" autoplay controls>
+                            <source src="${videoSrc}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
-                         <!-- Fullscreen Button (Inside to stay visible) -->
-                        <div class="absolute bottom-4 right-4 z-[70]">
+                         <!-- Fullscreen Button -->
+                        <div class="absolute bottom-4 right-4" style="z-index: 2147483647;">
                             <button onclick="toggleFullscreen()" id="fullscreenBtn"
                                 class="bg-black bg-opacity-50 w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-70 transition border border-gray-600">
                                 <i class="fa-solid fa-expand text-white"></i>
                             </button>
                         </div>
                     </div>`;
-            } else if (image && !image.includes('placehold.co')) {
-                // Show Image with simple animation
-                modalVideoContainer.innerHTML = `
-                    <div class="w-full h-full bg-black flex items-center justify-center overflow-hidden">
-                        <img src="${image}" class="w-full h-full object-contain animate-zoom-in" alt="${name}">
+
+                // Auto Fullscreen Attempt
+                // We request fullscreen on the CONTAINER so our custom button stays visible
+                // Small timeout to ensure DOM update
+                setTimeout(() => {
+                    const container = document.getElementById('modalVideoContainer');
+                    if (container) {
+                        if (container.requestFullscreen) {
+                            container.requestFullscreen();
+                        } else if (container.webkitRequestFullscreen) { /* Safari */
+                            container.webkitRequestFullscreen();
+                        } else if (container.msRequestFullscreen) { /* IE11 */
+                            container.msRequestFullscreen();
+                        }
+                    }
+                }, 100);
+
+            } else if (imageSrc && !imageSrc.includes('placehold.co')) {
+                container.innerHTML = `
+                    <div class="w-full h-full bg-black flex items-center justify-center overflow-hidden relative">
+                        <img src="${imageSrc}" class="w-full h-full object-contain animate-zoom-in" alt="${name}">
+                         <!-- Fullscreen Button -->
+                        <div class="absolute bottom-4 right-4" style="z-index: 2147483647;">
+                            <button onclick="toggleFullscreen()" id="fullscreenBtn"
+                                class="bg-black bg-opacity-50 w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-70 transition border border-gray-600">
+                                <i class="fa-solid fa-expand text-white"></i>
+                            </button>
+                        </div>
                     </div>`;
+
+                // Auto Fullscreen for images too, as per consistency
+                setTimeout(() => {
+                    const container = document.getElementById('modalVideoContainer');
+                    if (container) {
+                        if (container.requestFullscreen) {
+                            container.requestFullscreen();
+                        } else if (container.webkitRequestFullscreen) { /* Safari */
+                            container.webkitRequestFullscreen();
+                        } else if (container.msRequestFullscreen) { /* IE11 */
+                            container.msRequestFullscreen();
+                        }
+                    }
+                }, 100);
             } else {
-                // Placeholder video simulation
-                modalVideoContainer.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-red-900 to-black flex flex-col items-center justify-center">
+                container.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-red-900 to-black flex flex-col items-center justify-center">
                     <i class="fa-solid fa-circle-play text-8xl mb-4 animate-pulse text-white opacity-80"></i>
                     <p class="text-sm font-bold opacity-50 uppercase tracking-widest">Previsualització no disponible</p>
                 </div>`;
             }
 
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
-            modalVideoContainer.innerHTML = ''; // Aturar qualsevol vídeo si n'hi hagués
+            modalVideoContainer.innerHTML = '';
             if (document.fullscreenElement) document.exitFullscreen();
         }
 
